@@ -262,7 +262,7 @@ def idv_radar_data(yh_code=None, corp_name=None, stock_code=None):
     else:
         # 0. 재무정보는 최신 분기 실공시 기준
         # 0. 단, 배당은 1년에 한 번 이루어지기 때문에 최신 년도 공시 기준임
-        sil_df_y = sil_df['최근 연간 실적'].iloc[:, 3]  # 느리지만 .iloc으로 하는 이유는 공시 날짜가 다른 기업이 있기 때문
+        sil_df_y = sil_df['최근 연간 실적'].iloc[:, 2]  # 느리지만 .iloc으로 하는 이유는 공시 날짜가 다른 기업이 있기 때문
         sil_df_q = sil_df['최근 분기 실적'].iloc[:, 4]
 
         sil_df_y = sil_df_y.fillna(0)
@@ -308,28 +308,73 @@ def idv_radar_data(yh_code=None, corp_name=None, stock_code=None):
         return(data_dict)
 
 
-# -------- 관련 기업 지표 선정
+
+# -------- 관련 기업 지표 선정(상대적 비율 기준)
+
 def relate_radar_data(yh_code=None, corp_name=None, stock_code=None):
-    label_list=['배당성향', '유동성', '건전성', '수익성', '성장성']
+    label_list = ['배당성향', '유동성', '건전성', '수익성', '성장성']
     dict_list = []
 
-    # 주식 코드로 변환
-    gcode = 0
+    # 주식 코드,이름으로 변환
     if yh_code != None:
         gcode = yh_code_to_fn_gicode(yh_code)
+        nm = yh_code_to_nm(yh_code)
     elif corp_name != None:
         gcode = nm_to_fn_gicode(corp_name)
+        nm = corp_name
     elif stock_code != None:
         gcode = stock_code
+        nm = stc_code_to_nm(stock_code)
 
     relate_corp = relate_code_crawl(co=gcode)
 
     dict_list = [idv_radar_data(stock_code=stcd) for stcd in relate_corp]
-
     dict_list = [x for x in dict_list if x is not None]
 
+    keys_list = [list(dict_list[i].keys())[0] for i in range(len(dict_list))]
+
+    my_arr = np.zeros([5, 5])
+
+    for i, dic in enumerate(dict_list):
+        my_arr[i] = (np.array(dic[keys_list[i]]))
+
+    my_arr[:, 0] = (my_arr[:, 2] / my_arr[:, 2].mean()) * 100
+    my_arr[:, 1] = (my_arr[:, 2] / my_arr[:, 2].mean()) * 100
+    my_arr[:, 2] = (my_arr[:, 2] / my_arr[:, 2].mean()) * 100
+    my_arr[:, 3] = (my_arr[:, 3] / my_arr[:, 3].mean()) * 100
+    my_arr[:, 4] = (my_arr[:, 2] / my_arr[:, 2].mean()) * 100
+
+    for i, dic in enumerate(dict_list):
+        dic[keys_list[i]] = my_arr[i, :].tolist()
+        dict_list[i] = dic
 
     return label_list, dict_list
+
+
+
+# -------- 관련 기업 지표 선정(원본)
+
+# def relate_radar_data(yh_code=None, corp_name=None, stock_code=None):
+#     label_list=['배당성향', '유동성', '건전성', '수익성', '성장성']
+#     dict_list = []
+#
+#     # 주식 코드로 변환
+#     gcode = 0
+#     if yh_code != None:
+#         gcode = yh_code_to_fn_gicode(yh_code)
+#     elif corp_name != None:
+#         gcode = nm_to_fn_gicode(corp_name)
+#     elif stock_code != None:
+#         gcode = stock_code
+#
+#     relate_corp = relate_code_crawl(co=gcode)
+#
+#     dict_list = [idv_radar_data(stock_code=stcd) for stcd in relate_corp]
+#
+#     dict_list = [x for x in dict_list if x is not None]
+#
+#
+#     return label_list, dict_list
 
 
 
@@ -435,7 +480,7 @@ def index():
     nm='올리패스'
     # stc_code=nm_to_fn_gicode(nm)
     stc_code='005930' # 삼성전자 주식코드
-    yh_code='011155.KS' # CJ씨푸드 우선주 야후코드
+    yh_code='035420.KS' # 네이버 야후코드
     # ------------------
 
     radar_label, radar_dict=relate_radar_data(yh_code=yh_code, corp_name=None, stock_code=None) # TODO: 검색에서 기업 코드/이름 할당 받음
