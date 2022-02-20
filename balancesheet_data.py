@@ -176,7 +176,10 @@ com_df=com_df.drop(['gb', 'presid', 'region', '시장구분', '소속부', '구�
 # 임시 df 삭제
 del([com_df4, com_df5, com_df6, com_df7])
 
-
+# stock_code -> stock_code_ori
+# '단축코드' -> stock_code
+com_df['stock_code_ori']=com_df['stock_code']
+com_df['stock_code']=com_df['단축코드']
 
 #                   ==============
 #                     데이터 저장
