@@ -425,39 +425,42 @@ com_df = pd.read_csv('C:\\AI\\pythonProject\\venv\\project\\dashboard\\data\\com
 
 
 
+
+
+
 # ====================================================
 #                    라우터
 # =====================================================
-app = Flask(__name__, template_folder='production', static_folder='build' ) # template, static 폴더 다르게 지정 가능
-
-@app.route('/')
-def index():
-
-    # TODO: 검색에서 기업 코드/이름 할당 받음
-    # ------------------테스트용 nm ,stc_code, yh_code TODO 지울 것
-    nm='올리패스'
-    # stc_code=nm_to_fn_gicode(nm)
-    stc_code='005930' # 삼성전자 주식코드
-    yh_code='035420.KS' # 네이버 야후코드
-    # ------------------
-
-    radar_label, radar_dict=relate_radar_data(stock_code=stc_code) # TODO: 검색에서 기업 코드/이름 할당 받음
-    bar_label, bar_mch_list, bar_dg_list = mch_dg(stock_code=stc_code) # TODO: 데이터 없으면 0으로 처리하건 해야할듯
-
-
-    return render_template("index.html",
-                            RD_LABEL_LIST=radar_label,
-                            RD_DATA_DICT=radar_dict,
-                            BAR_LABEL_LIST=bar_label,
-                            BAR_DATA_LIST_MCH=bar_mch_list,
-                            BAR_DATA_LIST_DG=bar_dg_list
-                           )
-
-
-
-
-
-if __name__ == '__main__':               # 이 py 안에서 실행하면 '__main__'
-    app.debug=True                       # TODO(개발 끝나면 반드시 막기)
-    app.run(host='0.0.0.0', port=8899)
+# app = Flask(__name__, template_folder='production', static_folder='build' ) # template, static 폴더 다르게 지정 가능
+#
+# @app.route('/')
+# def index():
+#
+#     # TODO: 검색에서 기업 코드/이름 할당 받음
+#     # ------------------테스트용 nm ,stc_code, yh_code TODO 지울 것
+#     nm='올리패스'
+#     # stc_code=nm_to_fn_gicode(nm)
+#     stc_code='005930' # 삼성전자 주식코드
+#     yh_code='035420.KS' # 네이버 야후코드
+#     # ------------------
+#
+#     radar_label, radar_dict=relate_radar_data(stock_code=stc_code) # TODO: 검색에서 기업 코드/이름 할당 받음
+#     bar_label, bar_mch_list, bar_dg_list = mch_dg(stock_code=stc_code) # TODO: 데이터 없으면 0으로 처리하건 해야할듯
+#
+#
+#     return render_template("index.html",
+#                             RD_LABEL_LIST=radar_label,
+#                             RD_DATA_DICT=radar_dict,
+#                             BAR_LABEL_LIST=bar_label,
+#                             BAR_DATA_LIST_MCH=bar_mch_list,
+#                             BAR_DATA_LIST_DG=bar_dg_list
+#                            )
+#
+#
+#
+#
+#
+# if __name__ == '__main__':               # 이 py 안에서 실행하면 '__main__'
+#     app.debug=True                       # TODO(개발 끝나면 반드시 막기)
+#     app.run(host='0.0.0.0', port=8899)
 

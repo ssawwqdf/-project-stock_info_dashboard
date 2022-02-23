@@ -1,4 +1,33 @@
 # ====================================================
+#                       패키지
+# ====================================================
+# -------- data
+import pandas as pd
+import numpy as np
+
+import sqlalchemy as sa
+
+# -------- str
+import re
+# -------- date
+from datetime import datetime, date
+# -------- float
+import math
+
+# -------- craw
+from bs4 import BeautifulSoup  # 클래스라 생성자 만들어야 함
+import requests
+
+# -------- flask
+from flask import Flask, make_response, jsonify, request, render_template
+from flask_cors import CORS, cross_origin
+import json
+
+# -------- API
+import yfinance
+
+
+# ====================================================
 #                      데이터            # TODO(데이터 저장 다르게)
 # ====================================================
 
@@ -111,11 +140,11 @@ kos_kdq.loc[kos_kdq['구분']=='(4PC)', '회사명2']=kos_kdq['한글 종목명'
 #                   ==============
 
 # -------- 전체 데이터 프레임 병합
-        """
+"""
         kos_kdq(코스피, 코스닥에 대한 정보와 우선주, 전환을 포함한 상장 기업 데이터프레임)  : 주식 코드 포함, 우선주 정보 포함, 기업명 포함X 대신 주식 한글 종목 명과 한글 종목 약명 포함.(ex. 네이버 우선주인 경우 네이버우) -> 기업명 추출 했음
         listed_comp(기업 산업 정보를 포함한 상장 기업 데이터프레임)                       : 주식 코드 포함, 우선주 정보 없음, 기업명(corp_name) 포함
         nv_com_df2(네이버 재무제표 주소에 접근할 수 있는 코드가 있는 기업 데이터프레임)     : 주식 코드 포함 X, 우선주 정보 없음, 기업명(nm) 포함
-        """
+"""
 
 # 코드 설명:
 # listed_comp, nv_com_df: 같은 기업이어도 corp_name, nm이 다르게 표현된 경우 존재(띄어쓰기가 다르거나 영어 문자를 한글로 표현한 경우 등)
@@ -179,10 +208,43 @@ del([com_df4, com_df5, com_df6, com_df7])
 # stock_code -> stock_code_ori
 # '단축코드' -> stock_code
 com_df['stock_code_ori']=com_df['stock_code']
+com_df['stock_code_ori']=com_df['stock_code_ori'].astype('str')
 com_df['stock_code']=com_df['단축코드']
+
+#                   ==============
+#                    금융&보험 제거
+#                   ==============
+
+com_df=com_df.drop(com_df[com_df['industry'].str.contains('금융')].index, axis=0)
+com_df=com_df.drop(com_df[com_df['industry'].str.contains('보험')].index, axis=0)
+
 
 #                   ==============
 #                     데이터 저장
 #                   ==============
 
-com_df.to_csv('C:\\AI\\pythonProject\\venv\\project\\dashboard\\data\\com_df.csv', index=False) # TODO 경로 수정
+com_df.to_csv('C:\\AI\\pythonProject\\venv\\project\\dashboard\\data\\com_df_rm.csv', index=False) # TODO 경로 수정
+
+# com_df.info()
+
+
+#                   ==============
+#                     우선주 확인
+#                   ==============
+#
+# # com_df에서 보통주가 아닌 경우 'stock_code'의 끝자리
+# print(com_df[com_df['주식종류']!='보통주']['stock_code'].str[-1:].unique()) # ['5' 'K' '7' '9' 'L' 'M'] 0은 없음
+# print(com_df[com_df['주식종류']=='보통주']['stock_code'].str[-1:].unique()) # ['0'] 모두 0임
+#
+# # nv_com_df : 네이버에서 가져온 기업리스트.text
+# # nv_com_df : 주식은 'gb' 컬럼 값이 701임
+# print(nv_com_df[nv_com_df['gb']!=701]) # 701이 아닌 컬럼은 리츠, 선물, 펀드 이런 것
+# # nv_com_df에서 gb이 701인 것만 모아놓은 게 nv_com_df2
+#
+#
+# # nv_com_df2에서 주식코드 맨 마지막 자리 unique : 0만 있음
+# print(nv_com_df2['cd'].str[-1:].unique()) # ['0']
+#
+# # 보통주는 주식코드 모두 0으로 끝나는데 nv_com_df에서 가지고 있는 주식 코드 중 0 말고 다른 숫자나 글자로 끝나는 코드는 없다.
+#
+#

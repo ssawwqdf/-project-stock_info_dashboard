@@ -29,18 +29,18 @@ conn.close()
 # -----------------------
 
 # -----------------네이버 company list
-url = "http://comp.fnguide.com/XML/Market/CompanyList.txt"
-nv_com_res = requests.get(url)
-
-# print(nv_com_res.encoding)  # ISO-8859-1
-nv_com_res.encoding = "utf-8-sig"  # 그냥 utf-8하면 에러 날 수도 있다
-nv_com_json = json.loads(nv_com_res.text)  # { "Co": [ {},{},{} ] }
-
-nv_com_df = pd.DataFrame(data=nv_com_json["Co"])
-# print(com_df)
-# print(nv_com_df[nv_com_df['gb']=='701'])
-
-nv_com_df['gb']=nv_com_df['gb'].astype('int')
+# url = "http://comp.fnguide.com/XML/Market/CompanyList.txt"
+# nv_com_res = requests.get(url)
+#
+# # print(nv_com_res.encoding)  # ISO-8859-1
+# nv_com_res.encoding = "utf-8-sig"  # 그냥 utf-8하면 에러 날 수도 있다
+# nv_com_json = json.loads(nv_com_res.text)  # { "Co": [ {},{},{} ] }
+#
+# nv_com_df = pd.DataFrame(data=nv_com_json["Co"])
+# # print(com_df)
+# # print(nv_com_df[nv_com_df['gb']=='701'])
+#
+# nv_com_df['gb']=nv_com_df['gb'].astype('int')
 # print(nv_com_df.head())
 # nv_com_df.to_sql('temptemp', conn)
 
@@ -52,19 +52,19 @@ nv_com_df['gb']=nv_com_df['gb'].astype('int')
 
 # ---------------- listed company
 
-listed_comp=pd.read_csv('C:\\Users\\LHL\\Desktop\\상장법인목록.csv')
-
-listed_comp.columns=['corp_name', 'stock_code', 'industry', 'main_product','listed_date',  'settle_month', 'presid', 'hpage', 'region']
-listed_comp.info()
-
-# listed_comp.to_sql('listed_comp', conn)
-
-nv_com_df2=nv_com_df[nv_com_df['gb']==701]
-# nv_com_df2.info()
-com_df=pd.merge(nv_com_df2, listed_comp, how='outer', left_on= 'nm', right_on= 'corp_name')
-
-
-print(com_df)
+# listed_comp=pd.read_csv('C:\\Users\\LHL\\Desktop\\상장법인목록.csv')
+#
+# listed_comp.columns=['corp_name', 'stock_code', 'industry', 'main_product','listed_date',  'settle_month', 'presid', 'hpage', 'region']
+# listed_comp.info()
+#
+# # listed_comp.to_sql('listed_comp', conn)
+#
+# nv_com_df2=nv_com_df[nv_com_df['gb']==701]
+# # nv_com_df2.info()
+# com_df=pd.merge(nv_com_df2, listed_comp, how='outer', left_on= 'nm', right_on= 'corp_name')
+#
+#
+# print(com_df)
 # com_df.info()
 # print(com_df.iloc[:,1:4])
 # print(com_df.loc[com_df['nm'].isna(), ['nm', 'corp_name']])
@@ -87,9 +87,9 @@ print(com_df)
 # -----------------------
 # -----------------------
 
-gicode='A265520'
-url = f"http://comp.fnguide.com/SVO2/ASP/SVD_Finance.asp?NewMenuID=103&gicode={gicode}"
-headers = {'User-Agent': 'Mozilla'}
+# gicode='A265520'
+# url = f"http://comp.fnguide.com/SVO2/ASP/SVD_Finance.asp?NewMenuID=103&gicode={gicode}"
+# headers = {'User-Agent': 'Mozilla'}
 
 # res = requests.get(url, headers=headers)
 # soup = BeautifulSoup(res.text, "html.parser")
@@ -107,7 +107,7 @@ headers = {'User-Agent': 'Mozilla'}
 #     haha=box.select('tr')
 #     print(haha)
 
-table_list = pd.read_html(url, encoding='UTF-8')
+# table_list = pd.read_html(url, encoding='UTF-8')
 # print(len(table_list))
 # print(table_list[2].info())
 # print(table_list[2])
@@ -173,4 +173,9 @@ table_list = pd.read_html(url, encoding='UTF-8')
 
 # print(table_list[1].head())
 
-np.isnan
+import yfinance as yf
+print(yf.download('226440.KQ', period="1d"))
+
+ticker_dat = yf.Ticker('226440.KQ')
+loaded_data = ticker_dat.history(period="max", interval="1d")
+print(loaded_data)
